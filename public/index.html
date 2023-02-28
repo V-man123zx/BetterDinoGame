@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Firebase Hosting</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/9.17.1/firebase-app-compat.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/9.17.1/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/9.17.1/firebase-database-compat.js"></script>
+    <script defer src="/__/firebase/9.17.1/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/9.17.1/firebase-functions-compat.js"></script>
+    <script defer src="/__/firebase/9.17.1/firebase-messaging-compat.js"></script>
+    <script defer src="/__/firebase/9.17.1/firebase-storage-compat.js"></script>
+    <script defer src="/__/firebase/9.17.1/firebase-analytics-compat.js"></script>
+    <script defer src="/__/firebase/9.17.1/firebase-remote-config-compat.js"></script>
+    <script defer src="/__/firebase/9.17.1/firebase-performance-compat.js"></script>
+    <!-- 
+      initialize the SDK after all desired features are loaded, set useEmulator to false
+      to avoid connecting the SDK to running emulators.
+    -->
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+
+    <title>Google Dinosaur Game</title>
+    <style>
+      canvas {
+        background-color: #f7f7f7;
+        border: 1px solid #ccc;
+      }
+  
+      #dino {
+        position: absolute;
+        left: 50px;
+        bottom: 0;
+      }
+  
+      .obstacle {
+        position: absolute;
+        bottom: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Google Dinosaur Game</h1>
+    <canvas id="canvas" width="600" height="150"></canvas>
+    <script>
+      // Variables
+      var canvas = document.getElementById("canvas");
+      var ctx = canvas.getContext("2d");
+      var dino = { x: 50, y: 110, width: 50, height: 50, speed: 0, jump: false };
+      var obstacles = [];
+      var score = 0;
+      var gameSpeed = 100;
+      var keys = { Space: false };
+  
+      // Images
+      var dinoImg = new Image();
+      dinoImg.src = "Dino_image.jpeg";
+      var cactusImg = new Image();
+      cactusImg.src = "Cactus.jpeg";
+      var birdImg = new Image();
+      birdImg.src = "bird.png";
+  
+      // Event Listeners
+      document.addEventListener("keydown", function(event) {
+        if (event.code === "Space") {
+          keys.Space = true;
+        }
+      });
+  
+      document.addEventListener("keyup", function(event) {
+        if (event.code === "Space") {
+          keys.Space = false;
+          dino.jump = true;
+        }
+      });
+  
+      // Functions
+      function drawDino() {
+        ctx.drawImage(dinoImg, dino.x, dino.y, dino.width, dino.height);
+      }
+  
+      function drawObstacle() {
+        for (var i = 0; i < obstacles.length; i++) {
+          var obstacleImg = cactusImg;
+          if (obstacles[i].type === "bird") {
+            obstacleImg = birdImg;
+          }
+          ctx.drawImage(obstacleImg, obstacles[i].x, obstacles[i].y, obstacles[i].width, obstacles[i].height);
+        }
+      }
+  
+      function moveObstacle() {
+        for (var i = 0; i < obstacles.length; i++) {
+          obstacles[i].x -= gameSpeed;
+        }
+        if (obstacles.length > 0 && obstacles[0].x < -50) {
+          obstacles.shift();
+          score++;
+        }
+        if (obstacles.length < 3 && Math.random() < 0.03) {
+          var obstacleType = Math.random() < 0.5 ? "cactus" : "bird";
+          var obstacleWidth = obstacleType === "cactus" ? 20 + Math.random() * 30 : 40;
+          var obstacleHeight = obstacleType === "cactus" ? 20 + Math.random() * 80 : 30;
+          obstacles.push({ x: canvas.width, y: 110 - obstacleHeight, width: obstacleWidth, height: obstacleHeight, type: obstacleType });
+        }
+      }
+  
+      function collisionDetection() {
+        for (var i = 0; i < obstacles.length; i++) {
+          var obstacle = obstacles[i];
+          if (dino.x < obstacle.x + obstacle.width && dino.y + dino.height > obstacle.y) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function updateScore() {
+        ctx.fillStyle = "#000";
+        ctx.font = "20px Arial";
+        ctx.fillText("Score: " + score, 10, 25);
+      }
+
+      function gameOver() {
+        clearInterval(gameLoop);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#000";
+        ctx.font = "30px Arial";
+        ctx.fillText("Game Over", canvas.width / 2 - 80, canvas.height / 2 - 10);
+        ctx.fillText("Score: " + score, canvas.width / 2 - 55, canvas.height / 2 + 30);
+      }
+
+      function update() {
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Move dino
+        dino.speed += 0.5;
+        dino.y += dino.speed;
+        if (dino.y > 110) {
+          dino.y = 110;
+          dino.speed = 0;
+          dino.jump = false;
+        }
+        if (dino.jump) {
+          dino.speed = -10;
+        }
+
+        // Move obstacles
+        moveObstacle();
+
+        // Check collision
+        if (collisionDetection()) {
+          gameOver();
+          return;
+        }
+
+        // Draw elements
+        drawDino();
+        drawObstacle();
+        updateScore();
+      }
+
+      // Game Loop
+      for (var i = 0; i < 100; i++) {update()}
+      //var gameLoop = setInterval(update, 1000 / 60);
+  </script>
+  </body>
+</html>
