@@ -20,6 +20,7 @@ create a level based google dinosaur game with firebase and javascript
 12. select config options
 13. It creates public folder for you with index.html file for deafult webpage
 14. write webpage into public folder
-15. git add .
-16. git commit -m "message"
-17. git push
+15. install git
+16. git add .
+17. git commit -m "message"
+18. git push
