@@ -9,6 +9,7 @@ create a level based google dinosaur game with firebase and javascript
 1. Create github repo
 2. Clone repo
 3. Install node.js and npm
+Edit: add nodejs path to system enviornment variables
 4. Create project on firebase
 5. npm Install firebase using npm
 6. run setup file for firebase app in Cloned repo
